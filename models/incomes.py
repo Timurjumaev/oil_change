@@ -8,5 +8,4 @@ class Incomes(Base):
     order_id = Column(Integer)
     money = Column(Numeric)
     date = Column(DateTime)
-    comment = Column(String(999))
     branch_id = Column(Integer)

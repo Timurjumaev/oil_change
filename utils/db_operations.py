@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from db import Base
-from models.branches import Branches
 
 
 def get_in_db(
@@ -11,8 +10,7 @@ def get_in_db(
         user
 ):
     obj = db.query(model).filter(model.id == ident, model.branch_id == user.branch_id).first()
-    branch = db.query(Branches).filter(Branches.id == obj.branch_id).first()
-    if not obj or not branch.status:
+    if not obj:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Bazada bunday {model} yo'q"
