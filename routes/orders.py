@@ -12,9 +12,9 @@ orders_router = APIRouter(
 
 
 @orders_router.get("/get")
-def get_orders(ident: int = None, search: str = None, page: int = 0, limit: int = 25,
+def get_orders(customer_id: int = None, ident: int = None, search: str = None, page: int = 0, limit: int = 25,
                db: Session = Depends(database), current_user: CreateUser = Depends(get_current_active_user)):
-    return all_orders(ident, search, page, limit, db, current_user)
+    return all_orders(customer_id, ident, search, page, limit, db, current_user)
 
 
 @orders_router.post("/post")

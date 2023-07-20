@@ -9,13 +9,17 @@ from fastapi import HTTPException
 from utils.pagination import pagination
 
 
-def all_orders(ident, search, page, limit, db, user):
+def all_orders(customer_id, ident, search, page, limit, db, user):
     if page < 0 or limit < 0:
         raise HTTPException(status_code=400, detail="page yoki limit 0 dan kichik kiritilmasligi kerak!")
     orders = db.query(Orders).\
         filter(Orders.branch_id == user.branch_id).\
         options(joinedload(Orders.customer),
                 joinedload(Orders.trades))
+    if customer_id:
+        customer_filter = Orders.customer_id == customer_id
+    else:
+        customer_filter = Orders.id > 0
     if ident:
         ident_filter = Orders.id == ident
     else:
@@ -26,7 +30,7 @@ def all_orders(ident, search, page, limit, db, user):
                         (Customers.number.like(search_format))
     else:
         search_filter = Orders.id > 0
-    orders = orders.filter(ident_filter, search_filter).order_by(Orders.id.desc())
+    orders = orders.filter(customer_filter, ident_filter, search_filter).order_by(Orders.id.desc())
     return pagination(orders, page, limit)
 
 

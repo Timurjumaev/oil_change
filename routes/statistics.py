@@ -1,6 +1,8 @@
 from datetime import date
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from models.customers import Customers
 from models.expenses import Expenses
 from models.incomes import Incomes
 from models.products import Products
@@ -52,6 +54,15 @@ def get_total_products(current_user: CreateUser = Depends(get_current_active_use
     for product in products:
         money += product.price * product.amount
     return money
+
+
+@statistics_router.get("/total_customers")
+def get_total_customers(start: date = date.today(), end: date = date.today(), current_user:
+                        CreateUser = Depends(get_current_active_user), db: Session = Depends(database)):
+    customers = db.query(Customers).filter(Customers.branch_id == current_user.branch_id,
+                                           Customers.date <= end, Customers.date >= start).all()
+
+    return len(customers)
 
 
 
