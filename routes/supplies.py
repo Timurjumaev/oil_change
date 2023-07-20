@@ -15,15 +15,13 @@ supplies_router = APIRouter(
 @supplies_router.post("/post")
 def create_supply(new: CreateSupply, current_user: CreateUser = Depends(get_current_active_user),
                   db: Session = Depends(database)):
-    create_supply_y(new, db, current_user)
-    raise HTTPException(status_code=200, detail="Amaliyot muvaffaqiyatli amalga oshirildi")
+    return create_supply_y(new, db, current_user)
 
 
 @supplies_router.put("/put")
 def update_supply(this: UpdateSupply, db: Session = Depends(database),
                   current_user: CreateUser = Depends(get_current_active_user)):
-    update_supply_y(this, db, current_user)
-    raise HTTPException(status_code=200, detail="Amaliyot muvaffaqiyatli amalga oshirildi")
+    return update_supply_y(this, db, current_user)
 
 
 @supplies_router.delete("/delete")

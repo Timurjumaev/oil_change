@@ -10,6 +10,7 @@ from routes.orders import orders_router
 from routes.trades import trades_router
 from routes.expenses import expenses_router
 from routes.statistics import statistics_router
+from routes.files import files_router
 
 
 app = FastAPI()
@@ -23,6 +24,7 @@ app.include_router(orders_router)
 app.include_router(trades_router)
 app.include_router(expenses_router)
 app.include_router(statistics_router)
+app.include_router(files_router)
 
 
 app.add_middleware(

@@ -8,3 +8,4 @@ from models.trades import Trades
 from models.products import Products
 from models.branches import Branches
 from models.supplies import Supplies
+from models.files import Files

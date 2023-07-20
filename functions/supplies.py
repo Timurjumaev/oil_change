@@ -20,6 +20,7 @@ def create_supply_y(form, db, user):
         branch_id=user.branch_id
     )
     save_in_db(db, new)
+    return new
 
 
 def update_supply_y(form, db, user):
@@ -53,6 +54,13 @@ def update_supply_y(form, db, user):
                                             Products.category == form.category,
                                             Products.name == form.name,
                                             Products.price == form.price)
+        new_expense = Expenses(
+            supply_id=form.id,
+            money=new_supply.amount * new_supply.price,
+            date=date.today(),
+            branch_id=user.branch_id
+        )
+        save_in_db(db, new_expense)
         if product.first():
             product.update({
                 Products.amount: Products.amount + form.amount,
@@ -70,13 +78,8 @@ def update_supply_y(form, db, user):
                 branch_id=user.branch_id
             )
             save_in_db(db, new)
-        new_expense = Expenses(
-            supply_id=form.id,
-            money=new_supply.amount*new_supply.price,
-            date=date.today(),
-            branch_id=user.branch_id
-        )
-        save_in_db(db, new_expense)
+            return new
+        return "Amaliyot muvofaqqiyatli yakunlandi!"
 
 
 def delete_supply_y(ident, db, user):

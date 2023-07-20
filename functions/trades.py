@@ -36,6 +36,10 @@ def create_trade_e(form, db, user):
         branch_id=user.branch_id
     )
     save_in_db(db, new)
+    db.query(Products).filter(Products.id == form.product_id).update({
+        Products.amount: Products.amount - form.amount
+    })
+    db.commit()
 
 
 def update_trade_e(form, db, user):
@@ -51,12 +55,27 @@ def update_trade_e(form, db, user):
         raise HTTPException(status_code=400, detail=f"Kechirasiz, omborda {product.name} yetarli emas!")
     if form.price < 0:
         raise HTTPException(status_code=400, detail="Narx manfiy bo'lishi mumkin emas!")
+    old_trade = db.query(Trades).filter(Trades.id == form.id).first()
     db.query(Trades).filter(Trades.id == form.id).update({
         Trades.product_id: form.product_id,
         Trades.amount: form.amount,
         Trades.price: form.price
     })
     db.commit()
+    new_trade = db.query(Trades).filter(Trades.id == form.id).first()
+    if old_trade.product_id == new_trade.product_id:
+        db.query(Products).filter(Products.id == form.product_id).update({
+            Products.amount: Products.amount + old_trade.amount - new_trade.amount
+        })
+        db.commit()
+    else:
+        db.query(Products).filter(Products.id == new_trade.product_id).update({
+            Products.amount: Products.amount - new_trade.amount
+        })
+        db.query(Products).filter(Products.id == old_trade.product_id).update({
+            Products.amount: Products.amount + old_trade.amount
+        })
+        db.commit()
 
 
 def delete_trade_e(ident, db, user):
@@ -64,6 +83,12 @@ def delete_trade_e(ident, db, user):
     if get_in_db(db, Orders, trade.order_id, user).status:
         raise HTTPException(status_code=400, detail="Kechirasiz, ushbu savdo tegishli bo'lgan "
                                                     "buyurtma allaqachon sotilgan!")
+    trade = db.query(Trades).filter(Trades.id == ident).first()
     db.query(Trades).filter(Trades.id == ident).delete()
+    db.query(Products).filter(Products.id == trade.product_id).update({
+        Products.amount: Products.amount + trade.amount
+    })
     db.commit()
+
+
 

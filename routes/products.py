@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.products import Products
 from schemas.users import CreateUser
 from utils.login import get_current_active_user
@@ -14,7 +14,8 @@ products_router = APIRouter(
 @products_router.get("/get")
 def get_products(ident: int = None, search: str = None, category: str = None,
                  current_user: CreateUser = Depends(get_current_active_user), db: Session = Depends(database)):
-    products = db.query(Products).filter(Products.branch_id == current_user.branch_id)
+    products = db.query(Products).options(joinedload(Products.file)).\
+        filter(Products.branch_id == current_user.branch_id)
     if ident:
         ident_filter = Products.id == ident
     else:
